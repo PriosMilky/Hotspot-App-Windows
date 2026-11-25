@@ -1,0 +1,20 @@
+{
+  "name": "coco-mikrotik-hotspot-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Portable local CO&CO MikroTik Hotspot management app",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "setup-auth": "node scripts/setup-auth.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "iron-session": "^9.1.0"
+  }
+}

@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#F5F7FB">
+  <title>Masuk | CO&amp;CO Hotspot</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Segoe UI", Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #19243A;
+      background: #F5F7FB;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      display: grid;
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px;
+      place-items: center;
+      background: #F5F7FB;
+    }
+
+    .login-card {
+      width: min(100%, 420px);
+      padding: 34px;
+      border: 1px solid #E3E8F1;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 16px 48px rgb(23 35 61 / 9%);
+    }
+
+    .brand {
+      margin: 0;
+      color: #0965F5;
+      font-size: clamp(2.2rem, 11vw, 3rem);
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      line-height: 1;
+      text-align: center;
+    }
+
+    .brand-mark {
+      width: 52px;
+      height: 3px;
+      margin: 16px auto 28px;
+      border-radius: 999px;
+      background: #F28C38;
+    }
+
+    h1 {
+      margin: 0;
+      color: #17233D;
+      font-size: 1.35rem;
+      text-align: center;
+    }
+
+    .intro {
+      margin: 7px 0 25px;
+      color: #68758D;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .field { display: grid; gap: 7px; margin-bottom: 17px; }
+
+    label {
+      color: #19243A;
+      font-size: 0.88rem;
+      font-weight: 620;
+    }
+
+    input {
+      width: 100%;
+      min-height: 50px;
+      padding: 0 13px;
+      border: 1px solid #E3E8F1;
+      border-radius: 10px;
+      background: #fff;
+      color: #19243A;
+      font: inherit;
+      font-size: 16px;
+    }
+
+    input:focus-visible,
+    button:focus-visible {
+      outline: 3px solid rgb(36 85 198 / 25%);
+      outline-offset: 2px;
+    }
+
+    .error {
+      min-height: 1.4em;
+      margin: -2px 0 12px;
+      color: #C53030;
+      font-size: 0.84rem;
+    }
+
+    button {
+      width: 100%;
+      min-height: 50px;
+      border: 0;
+      border-radius: 10px;
+      background: #2455C6;
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover:not(:disabled) { background: #1D469F; }
+    button:disabled { opacity: 0.65; cursor: wait; }
+
+    .access-note {
+      margin: 18px 0 0;
+      color: #68758D;
+      font-size: 0.78rem;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 16px; }
+      .login-card { padding: 28px 22px; }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        color-scheme: dark;
+        color: #E7EDF5;
+        background: #101827;
+      }
+
+      body { background: #101827; }
+      .login-card { border-color: #344259; background: #182235; }
+      h1, label { color: #E7EDF5; }
+      .intro, .access-note { color: #AFB9C9; }
+      input { border-color: #344259; background: #101827; color: #E7EDF5; }
+      .error { color: #FF9292; }
+    }
+  </style>
+</head>
+<body>
+  <main class="login-card">
+    <p class="brand" aria-label="CO and CO">CO&amp;CO</p>
+    <div class="brand-mark" aria-hidden="true"></div>
+    <h1>Masuk ke Hotspot User</h1>
+    <p class="intro">Gunakan akun aplikasi yang diberikan admin.</p>
+    <form id="login-form">
+      <div class="field">
+        <label for="username">Username</label>
+        <input id="username" name="username" type="text" maxlength="64" autocomplete="username" required autofocus>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" maxlength="128" autocomplete="current-password" required>
+      </div>
+      <p class="error" id="login-error" role="alert" aria-live="polite"></p>
+      <button id="login-button" type="submit">Masuk</button>
+    </form>
+    <p class="access-note">Akses terbatas untuk akun yang terdaftar.</p>
+  </main>
+  <script>
+    const form = document.querySelector('#login-form');
+    const usernameInput = document.querySelector('#username');
+    const passwordInput = document.querySelector('#password');
+    const errorMessage = document.querySelector('#login-error');
+    const loginButton = document.querySelector('#login-button');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      errorMessage.textContent = '';
+      loginButton.disabled = true;
+      loginButton.textContent = 'Memeriksa...';
+
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            username: usernameInput.value,
+            password: passwordInput.value,
+          }),
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Tidak dapat masuk.');
+        window.location.replace('/');
+      } catch (error) {
+        errorMessage.textContent = error.message || 'Tidak dapat terhubung ke server.';
+        passwordInput.focus();
+      } finally {
+        loginButton.disabled = false;
+        loginButton.textContent = 'Masuk';
+      }
+    });
+  </script>
+</body>
+</html>
